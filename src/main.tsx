@@ -9,7 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+  
     <UserProvider>
       <BrowserRouter>
         <Routes>
@@ -26,5 +26,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </Routes>
       </BrowserRouter>
     </UserProvider>
-  </React.StrictMode>
+
 );

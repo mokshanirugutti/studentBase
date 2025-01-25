@@ -3,6 +3,7 @@ import { useUser } from "../context/UserContext";
 import { db } from "../firebase";
 import { addDoc, collection, getDocs } from "firebase/firestore";
 import Modal from "../components/Modal";
+import UserBadge from "@/components/userBadge";
 
 interface Student {
   id: string;
@@ -51,9 +52,11 @@ const Home = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Welcome, {user?.email}</h1>
+      <UserBadge/>
+      <br />
       <button
         onClick={() => setIsModalOpen(true)}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
+        className="bg-blue-500 text-white px-4 py-2 rounded my-10"
       >
         Add Student
       </button>
