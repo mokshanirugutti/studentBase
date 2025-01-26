@@ -28,7 +28,7 @@ export default function UserBadge() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="max-w-64">
         <DropdownMenuLabel className="flex min-w-0 flex-col">
-          <span className="truncate text-sm font-medium text-foreground">{user?.firstName}</span>
+          <span className="truncate text-sm font-medium text-foreground capitalize">{user?.firstName} {user?.lastName}</span>
           <span className="truncate text-xs font-normal text-muted-foreground">
             {user?.email}
           </span>
