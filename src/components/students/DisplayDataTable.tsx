@@ -76,7 +76,7 @@ import { Student } from '@/types'
 
 
 // Custom filter function for multi-column searching
-const multiColumnFilterFn: FilterFn<Student> = (row,  filterValue) => {
+const multiColumnFilterFn: FilterFn<Student> = (row, _columnId, filterValue) => {
   const searchableRowContent = `${row.original.firstName} ${row.original.lastName}`.toLowerCase();
   const searchTerm = (filterValue ?? "").toLowerCase();
   return searchableRowContent.includes(searchTerm);
@@ -221,12 +221,12 @@ export default function DisplayDataTable({onStudentAdded, data}:DisplayDataTable
             <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
               <ListFilter size={16} strokeWidth={2} aria-hidden="true" />
             </div>
-            {Boolean(table.getColumn("name")?.getFilterValue()) && (
+            {Boolean(table.getColumn("firstName")?.getFilterValue()) && (
               <button
                 className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Clear filter"
                 onClick={() => {
-                  table.getColumn("name")?.setFilterValue("");
+                  table.getColumn("firstName")?.setFilterValue("");
                   if (inputRef.current) {
                     inputRef.current.focus();
                   }
