@@ -69,21 +69,11 @@ import {
   ListFilter,
   Trash,
 } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
-import { db } from "../../firebase";
-import { collection, getDocs } from "firebase/firestore";
+import {  useId, useRef, useState } from "react";
 import StudentDetailsInput from "./StudentDeatilsInput";
 
+import { Student } from '@/types'
 
-interface Student {
-  id: string;
-  firstName: string;
-  lastName: string;
-  dob: string;
-  phone: string;
-  city: string;
-  country: string;
-}
 
 // Custom filter function for multi-column searching
 const multiColumnFilterFn: FilterFn<Student> = (row,  filterValue) => {
@@ -155,9 +145,12 @@ const columns: ColumnDef<Student>[] = [
 ];
 
 interface DisplayDataTableProps {
-  onStudentAdded: () => void; 
+  onStudentAdded: (newStudent: Omit<Student, "id">) => void;
+  
+  data : Student[];
 }
-export default function DisplayDataTable({onStudentAdded}:DisplayDataTableProps) {
+
+export default function DisplayDataTable({onStudentAdded, data}:DisplayDataTableProps) {
   const id = useId();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -174,30 +167,15 @@ export default function DisplayDataTable({onStudentAdded}:DisplayDataTableProps)
     },
   ]);
 
-  const [data, setData] = useState<Student[]>([]);
 
-  const fetchStudents = async () => {
-    const querySnapshot = await getDocs(collection(db, "students"));
-    setData(
-      querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Student[]
-    );
-  };
-
-  useEffect(() => {
-    fetchStudents();
-  }, []);
-
-  const handleDeleteRows = () => {
-    const selectedRows = table.getSelectedRowModel().rows;
-    const updatedData = data.filter(
-      (item) => !selectedRows.some((row) => row.original.id === item.id),
-    );
-    setData(updatedData);
-    table.resetRowSelection();
-  };
+  // const handleDeleteRows = () => {
+  //   const selectedRows = table.getSelectedRowModel().rows;
+  //   const updatedData = data.filter(
+  //     (item) => !selectedRows.some((row) => row.original.id === item.id),
+  //   );
+  //   setData(updatedData);
+  //   table.resetRowSelection();
+  // };
 
   const table = useReactTable({
     data,
@@ -329,7 +307,7 @@ export default function DisplayDataTable({onStudentAdded}:DisplayDataTableProps)
                 </div>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteRows}>Delete</AlertDialogAction>
+                  <AlertDialogAction >Delete</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>

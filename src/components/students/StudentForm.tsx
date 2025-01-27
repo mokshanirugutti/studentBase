@@ -1,42 +1,26 @@
+// src/components/StudentForm.tsx
 import React, { useState, useEffect } from "react";
-import { db } from "../../firebase";
-import { collection, getDocs } from "firebase/firestore";
-import StudentDetailsInput from "./StudentDeatilsInput";
+import { fetchStudents } from "../../services/studentService"; // Import the service
 import DisplayDataTable from "./DisplayDataTable";
-
-interface Student {
-  id: string;
-  firstName: string;
-  lastName: string;
-  age: string;
-  grade: string;
-  dob: string;
-  phone: string;
-  city: string;
-  country: string;
-}
+import { Student } from '@/types'
 
 const StudentForm: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState<Boolean>(true);
 
-  const fetchStudents = async () => {
-    const querySnapshot = await getDocs(collection(db, "students"));
-    setStudents(
-      querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Student[]
-    );
+  const loadStudents = async () => {
+    setLoading(true);
+    const studentsData = await fetchStudents();
+    setStudents(studentsData);
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchStudents();
+    loadStudents();
   }, []);
 
   const handleStudentAdded = () => {
-    fetchStudents(); // Refresh the student list after a new student is added
+    loadStudents(); // Refresh the student list after a new student is added
   };
 
   return (
@@ -47,7 +31,7 @@ const StudentForm: React.FC = () => {
         ) : (
           <div className="overflow-x-auto">
             <h2 className="text-xl font-bold mb-4">Student List</h2>
-            <DisplayDataTable onStudentAdded={handleStudentAdded}/>
+            <DisplayDataTable onStudentAdded={handleStudentAdded} data={students} />
           </div>
         )}
       </ul>

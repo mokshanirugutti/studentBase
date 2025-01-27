@@ -11,23 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useId, useState } from "react";
 import { db } from "../../firebase";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import LoadingButton from '@/components/ui/LoadingButton';
-
-interface Student {
-  id: string;
-  firstName: string;
-  lastName: string;
-  age: string;
-  grade: string;
-  dob: string;
-  phone: string;
-  city: string;
-  country: string;
-}
+import {Student } from '@/types'
 
 interface StudentDetailsInputProps {
-  onStudentAdded: () => void; // Callback to refresh the student list
+  onStudentAdded:(newStudent: Omit<Student, "id">) => void;
 }
 
 export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsInputProps) {
@@ -42,7 +31,7 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
     fatherName: "",
     phone: "",
     fatherPhone: "",
-    email: "",
+    mail: "",
     city: "",
     state: "",
     country: "",
@@ -67,12 +56,12 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
         fatherName: "",
         phone: "",
         fatherPhone: "",
-        email: "",
+        mail: "",
         city: "",
         state: "",
         country: "",
       }); // Reset form fields
-      onStudentAdded(); // Trigger the callback to refresh the student list
+      onStudentAdded(studentData); // Trigger the callback to refresh the student list
     } catch (error) {
       console.error("Error adding student:", error);
     }
@@ -151,7 +140,7 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
               />
             </div>
 
-            {/* DATE OF BIRTH */}
+            {/* DOB */}
             <div className="flex flex-col space-y-2">
               <div className="flex gap-2">
                 <Label htmlFor={`dob-${id}`}>Date of Birth</Label>
@@ -159,7 +148,6 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
               </div>
               <Input
                 className="[direction:inherit]"
-                type="date"
                 id={`dob-${id}`}
                 name="dob"
                 value={studentData.dob}
@@ -170,43 +158,18 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
 
             {/* GENDER */}
             <div className="flex flex-col space-y-2">
-              <Label htmlFor={`gender-${id}`}>Gender</Label>
-              <div className="flex space-x-4">
-                <div>
-                  <input
-                    type="radio"
-                    id={`gender-male-${id}`}
-                    name="gender"
-                    value="male"
-                    className="hidden peer"
-                    onChange={handleInputChange}
-                    required
-                  />
-                  <Label
-                    htmlFor={`gender-male-${id}`}
-                    className="cursor-pointer inline-flex items-center p-2 border border-gray-300 rounded-md peer-checked:bg-blue-500 peer-checked:text-white"
-                  >
-                    Male
-                  </Label>
-                </div>
-                <div>
-                  <input
-                    type="radio"
-                    id={`gender-female-${id}`}
-                    name="gender"
-                    value="female"
-                    className="hidden peer"
-                    onChange={handleInputChange}
-                    required
-                  />
-                  <Label
-                    htmlFor={`gender-female-${id}`}
-                    className="cursor-pointer inline-flex items-center p-2 border border-gray-300 rounded-md peer-checked:bg-blue-500 peer-checked:text-white"
-                  >
-                    Female
-                  </Label>
-                </div>
+              <div className="flex gap-2">
+                <Label htmlFor={`gender-${id}`}>Gender</Label>
+                <span className="text-red-600">*</span>
               </div>
+              <Input
+                className="[direction:inherit]"
+                id={`gender-${id}`}
+                name="gender"
+                value={studentData.gender}
+                onChange={handleInputChange}
+                required
+              />
             </div>
 
             {/* FATHER NAME */}
@@ -225,15 +188,14 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
               />
             </div>
 
-            {/* PHONE NUMBER */}
+            {/* PHONE */}
             <div className="flex flex-col space-y-2">
               <div className="flex gap-2">
-                <Label htmlFor={`phone-${id}`}>Phone No</Label>
+                <Label htmlFor={`phone-${id}`}>Phone</Label>
                 <span className="text-red-600">*</span>
               </div>
               <Input
                 className="[direction:inherit]"
-                type="tel"
                 id={`phone-${id}`}
                 name="phone"
                 value={studentData.phone}
@@ -242,15 +204,14 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
               />
             </div>
 
-            {/* FATHER PHONE NUMBER */}
+            {/* FATHER PHONE */}
             <div className="flex flex-col space-y-2">
               <div className="flex gap-2">
-                <Label htmlFor={`fatherPhone-${id}`}>Father's Phone No</Label>
+                <Label htmlFor={`fatherPhone-${id}`}>Father's Phone</Label>
                 <span className="text-red-600">*</span>
               </div>
               <Input
                 className="[direction:inherit]"
-                type="tel"
                 id={`fatherPhone-${id}`}
                 name="fatherPhone"
                 value={studentData.fatherPhone}
@@ -262,15 +223,14 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
             {/* EMAIL */}
             <div className="flex flex-col space-y-2">
               <div className="flex gap-2">
-                <Label htmlFor={`email-${id}`}>Email</Label>
+                <Label htmlFor={`mail-${id}`}>Email</Label>
                 <span className="text-red-600">*</span>
               </div>
               <Input
                 className="[direction:inherit]"
-                type="email"
-                id={`email-${id}`}
-                name="email"
-                value={studentData.email}
+                id={`mail-${id}`}
+                name="mail"
+                value={studentData.mail}
                 onChange={handleInputChange}
                 required
               />
@@ -325,9 +285,11 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
             </div>
           </div>
 
-          <button type="submit" className="w-full">
-            <LoadingButton title="Add Student"  className="w-full " />
-          </button>
+          <div className="flex justify-end">
+            <button type="submit">
+              <LoadingButton title="Add Student" />
+            </button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
