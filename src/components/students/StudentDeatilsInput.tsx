@@ -9,17 +9,20 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useId, useState } from "react";
+import { useId, useState, useEffect } from "react";
 import { db } from "../../firebase";
 import { addDoc, collection } from "firebase/firestore";
 import LoadingButton from '@/components/ui/LoadingButton';
-import {Student } from '@/types'
+import { Student } from '@/types'
+import DatePickerInput from "../ui/DatePickerInput";
+import PhoneNumberInput from "../ui/PhoneNumberInput";
 
 interface StudentDetailsInputProps {
-  onStudentAdded:(newStudent: Omit<Student, "id">) => void;
+  onStudentAdded: (newStudent: Omit<Student, "id">) => void;
+  editingStudent?: Partial<Student> | null;
 }
 
-export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsInputProps) {
+export default function StudentDetailsInput({ onStudentAdded, editingStudent }: StudentDetailsInputProps) {
   const id = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [studentData, setStudentData] = useState({
@@ -37,9 +40,31 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
     country: "",
   });
 
+  useEffect(() => {
+    if (editingStudent) {
+      setIsOpen(true);
+      setStudentData(prev => ({
+        ...prev,
+        ...editingStudent
+      }));
+    }
+  }, [editingStudent]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setStudentData({ ...studentData, [name]: value });
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStudentData({ ...studentData, dob: e.target.value });
+  };
+
+  const handlePhoneChange = (value: string | undefined) => {
+    setStudentData({ ...studentData, phone: value || "" });
+  };
+
+  const handleFatherPhoneChange = (value: string | undefined) => {
+    setStudentData({ ...studentData, fatherPhone: value || "" });
   };
 
   const handleAddStudent = async (e: React.FormEvent) => {
@@ -142,17 +167,12 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
 
             {/* DOB */}
             <div className="flex flex-col space-y-2">
-              <div className="flex gap-2">
-                <Label htmlFor={`dob-${id}`}>Date of Birth</Label>
-                <span className="text-red-600">*</span>
-              </div>
-              <Input
-                className="[direction:inherit]"
+              <DatePickerInput
                 id={`dob-${id}`}
                 name="dob"
+                title="Date of Birth"
                 value={studentData.dob}
-                onChange={handleInputChange}
-                required
+                onChange={handleDateChange}
               />
             </div>
 
@@ -162,14 +182,34 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
                 <Label htmlFor={`gender-${id}`}>Gender</Label>
                 <span className="text-red-600">*</span>
               </div>
-              <Input
-                className="[direction:inherit]"
-                id={`gender-${id}`}
-                name="gender"
-                value={studentData.gender}
-                onChange={handleInputChange}
-                required
-              />
+              <div className="flex gap-4">
+                {/* Male Radio Button */}
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    id={`gender-male-${id}`}
+                    name="gender"
+                    value="male"
+                    checked={studentData.gender === "male"}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <span>Male</span>
+                </label>
+                {/* Female Radio Button */}
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    id={`gender-female-${id}`}
+                    name="gender"
+                    value="female"
+                    checked={studentData.gender === "female"}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <span>Female</span>
+                </label>
+              </div>
             </div>
 
             {/* FATHER NAME */}
@@ -190,33 +230,21 @@ export default function StudentDetailsInput({ onStudentAdded }: StudentDetailsIn
 
             {/* PHONE */}
             <div className="flex flex-col space-y-2">
-              <div className="flex gap-2">
-                <Label htmlFor={`phone-${id}`}>Phone</Label>
-                <span className="text-red-600">*</span>
-              </div>
-              <Input
-                className="[direction:inherit]"
+              <PhoneNumberInput
                 id={`phone-${id}`}
-                name="phone"
+                title ="Phone No:"
                 value={studentData.phone}
-                onChange={handleInputChange}
-                required
+                onChange={handlePhoneChange}
               />
             </div>
 
             {/* FATHER PHONE */}
             <div className="flex flex-col space-y-2">
-              <div className="flex gap-2">
-                <Label htmlFor={`fatherPhone-${id}`}>Father's Phone</Label>
-                <span className="text-red-600">*</span>
-              </div>
-              <Input
-                className="[direction:inherit]"
+              <PhoneNumberInput
                 id={`fatherPhone-${id}`}
-                name="fatherPhone"
+                title="Father phone: "
                 value={studentData.fatherPhone}
-                onChange={handleInputChange}
-                required
+                onChange={handleFatherPhoneChange}
               />
             </div>
 

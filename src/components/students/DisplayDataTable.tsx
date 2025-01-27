@@ -70,7 +70,8 @@ import {
   Trash,
 } from "lucide-react";
 import {  useId, useRef, useState } from "react";
-import StudentDetailsInput from "./StudentDeatilsInput";
+
+import { deleteStudent } from "../../services/studentService";
 
 import { Student } from '@/types'
 
@@ -138,19 +139,25 @@ const columns: ColumnDef<Student>[] = [
   {
     id: "actions",
     header: () => <span className="sr-only">Actions</span>,
-    cell: ({ row }) => <RowActions row={row} />,
+    cell: ({ row, table }) => {
+      const meta = table.options.meta as { 
+        onEditStudent: (student: Partial<Student>) => void;
+        onStudentDeleted?: () => void;
+      };
+      return <RowActions row={row} onEditStudent={meta.onEditStudent} onStudentDeleted={meta.onStudentDeleted} />;
+    },
     size: 60,
     enableHiding: false,
   },
 ];
 
 interface DisplayDataTableProps {
-  onStudentAdded: (newStudent: Omit<Student, "id">) => void;
-  
-  data : Student[];
+  onEditStudent: (student: Partial<Student>) => void;
+  onStudentDeleted?: () => void;
+  data: Student[];
 }
 
-export default function DisplayDataTable({onStudentAdded, data}:DisplayDataTableProps) {
+export default function DisplayDataTable({ onEditStudent, onStudentDeleted, data}: DisplayDataTableProps) {
   const id = useId();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -196,10 +203,14 @@ export default function DisplayDataTable({onStudentAdded, data}:DisplayDataTable
       columnFilters,
       columnVisibility,
     },
+    meta: {
+      onEditStudent,
+      onStudentDeleted,
+    }
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mx-5">
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -312,8 +323,7 @@ export default function DisplayDataTable({onStudentAdded, data}:DisplayDataTable
               </AlertDialogContent>
             </AlertDialog>
           )}
-          {/* Add student button */}
-          <StudentDetailsInput onStudentAdded={onStudentAdded} />
+          
         </div>
       </div>
 
@@ -506,7 +516,38 @@ export default function DisplayDataTable({onStudentAdded, data}:DisplayDataTable
   );
 }
 
-function RowActions({  }: { row: Row<Student> }) {
+function RowActions({ row, onEditStudent, onStudentDeleted }: { row: Row<Student>; onEditStudent: (student: Partial<Student>) => void; onStudentDeleted?: () => void }) {
+  const student = row.original;
+
+  const handleEdit = () => {
+    onEditStudent({
+      id: student.id,
+      firstName: student.firstName,
+      middleName: student.middleName,
+      lastName: student.lastName,
+      dob: student.dob,
+      gender: student.gender,
+      fatherName: student.fatherName,
+      phone: student.phone,
+      fatherPhone: student.fatherPhone,
+      mail: student.mail,
+      city: student.city,
+      state: student.state,
+      country: student.country
+    });
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteStudent(student.id);
+      if (onStudentDeleted) {
+        onStudentDeleted();
+      }
+    } catch (error) {
+      console.error("Error deleting student:", error);
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -518,12 +559,12 @@ function RowActions({  }: { row: Row<Student> }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={handleEdit}>
             <span>Edit</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="text-destructive focus:text-destructive">
-          <span>Delete</span>
-        </DropdownMenuItem>  
+          <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={handleDelete}>
+            <span>Delete</span>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

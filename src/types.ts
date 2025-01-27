@@ -7,6 +7,7 @@ export interface Student {
     gender : string;
     fatherName:string;
     phone : string;
+    fatherPhone: string;
     mail:string;
     city: string;
     state:string;
