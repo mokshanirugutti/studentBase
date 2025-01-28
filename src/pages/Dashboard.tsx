@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import StatisticsChart from '../components/Dashboard/StatisticsChart';
-
+import DataShowCard from '@/components/ui/DataShowCard';
+import { IoMdMale,IoMdFemale } from "react-icons/io";
+import { MdVerified } from "react-icons/md";
+import { GoUnverified } from "react-icons/go";
 const Dashboard: React.FC = () => {
   const [totalMale, setTotalMale] = useState(0);
   const [totalFemale, setTotalFemale] = useState(0);
@@ -47,7 +50,12 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <div className='flex gap-3 justify-around'>
+          <DataShowCard title="Male Students" value={totalMale} icon={IoMdMale} />
+          <DataShowCard title="Female Students" value={totalFemale} icon={IoMdFemale}/>
+          <DataShowCard title="Selected " value={20} icon={MdVerified}/>
+          <DataShowCard title="Unselected " value={30} icon={GoUnverified}/>
+      </div>
       {loading ? (
         <p>Loading...</p>
       ) : (

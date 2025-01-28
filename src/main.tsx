@@ -5,10 +5,11 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
+import {HeroUIProvider} from '@heroui/react'
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  
+  <HeroUIProvider>
     <UserProvider>
       <BrowserRouter>
         <Routes>
@@ -21,9 +22,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Home />
               </ProtectedRoute>
             }
-          />
+            />
         </Routes>
       </BrowserRouter>
     </UserProvider>
+  </HeroUIProvider>
 
 );
