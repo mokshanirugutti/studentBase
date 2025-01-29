@@ -11,19 +11,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUser } from "@/context/UserContext";
 
-import { HomeIcon,  ChevronDown, User2Icon, LogOut, SettingsIcon } from "lucide-react";
+import { HomeIcon,  User2Icon, LogOut, SettingsIcon } from "lucide-react";
 
 export default function UserBadge() {
   const { user, logout } = useUser();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
+        <Button variant="outline" className="h-auto p-0 hover:bg-transparent rounded-full">
           <Avatar>
             <AvatarImage src="./avatar.jpg" alt="Profile image" />
             <AvatarFallback className="capitalize">{user?.firstName![0]} {user?.lastName![0]} </AvatarFallback>
           </Avatar>
-          <ChevronDown size={16} strokeWidth={2} className="ms-2 opacity-60" aria-hidden="true" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="max-w-64">
